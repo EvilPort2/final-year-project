@@ -27,4 +27,4 @@ Hope that I have pretty much listed everything.
 Then goto option 2 to set the color mask for the paper that you are going to wear in your finger for gesture recognition and also set your face for unlocking the lockscreen. If that is done you can go back and choose option 1 to start the gesture recognition program.<br>
 If you liked the facial unlock program you can directly start it using<br>
     
-    python3 unlock_using_face.py
+    python3 modules/face_lock_unlock/unlock_using_face.py
