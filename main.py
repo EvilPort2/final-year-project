@@ -1,8 +1,8 @@
 import os
 import sys
-from gesture_recognition.gesture_action import gesture_action 
-from color_picker.color_picker import color_picker
-from face_recognition.faceRecognizeMain import face_recognition_main
+from modules.gesture_recognition.gesture_action import gesture_action 
+from modules.color_picker.color_picker import color_picker
+from modules.face_lock_unlock.face_recognition.faceRecognizeMain import face_recognition_main
 
 def clear_screen():
 	os.system("cls")
@@ -33,7 +33,7 @@ def show_settings():
 			# automatted color detection
 			color_picker()
 		elif choice == 2:
-			os.system("python range-detector.py -f HSV -w")
+			os.system("python modules/range-detector.py -f HSV -w")
 		elif choice == 3:
 			face_recognition_main()
 		else:
