@@ -60,7 +60,7 @@ def match_face(unlockFaceId):
 		if flagFaceMatched == True:
 			break
 		cv2.imshow("Face Recognition Running", img)
-		cv2.waitKey(10)
+		cv2.waitKey(1)
 	cam.release()
 	cv2.destroyAllWindows()
 
