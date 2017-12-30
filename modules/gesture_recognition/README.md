@@ -26,18 +26,16 @@ Since I am wearing a yellow cap in my fingers, I use that to segment the yellow 
 8. T - Display task manager<br>
 9. \> - Alt+tab<br>
 10. < - Alt+Shift+Tab<br>
-11. <> - Take a photo
-12. [] - Screenshot
-13. Square and line - Open text editor
+11. Straight line down - Minimize<br>
+12. Straight line up - Maximize<br>
+13. Reverse cross - Cut<br>
+14. <> - Take a photo
+15. [] - Screenshot
+16. Square and line - Open text editor
 
 # Prerequisites
 1. Since I am using threads in the program the first thing you need to do is go to the site mentioned and apply the solution given. Here is the website https://stackoverflow.com/questions/36809788/importerror-no-module-named-thread<br>
 2. You need additional imutils functionalities. These can be found here https://github.com/jrosebr1/imutils.<br>
-
-# Usage
-First run the range-detector.py to set the range for the mask for colour segmentation and then press q when the perfect range is found. Then start the gesture_action.py. No need to change anything in the gesture_action.py file.
-    python3 range-detector.py -f HSV -w
-    python3 gesture_action.py
 
 # Got a question?
 If you have any questions that are bothering you please contact me on my <a href = "facebook.com/dibakar.saha.750">facebook profile</a>. Just do not ask me questions like where do I live, who do I work for etc. Also no questions like what does this line do. If you think a line is redundant or can be removed to make the program better then you can obviously ask me or make a pull request.
