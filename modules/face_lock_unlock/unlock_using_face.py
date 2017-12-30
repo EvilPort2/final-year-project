@@ -1,7 +1,7 @@
 from threading import Thread
 import tkinter, win32api, win32con, pywintypes
 from face_matching import match_face
-import pygame, PyHook3, os, thread, time
+import os
 
 def KeyboardMouseDisable(event):
     print("Keyboard and Mouse are disabled")
