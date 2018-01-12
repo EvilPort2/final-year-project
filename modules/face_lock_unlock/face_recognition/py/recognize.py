@@ -1,6 +1,5 @@
 'This program should be executed third'
 import cv2
-import sqlite3
 from .database import getProfileDataById
 
 def faceRecognize():
