@@ -79,11 +79,11 @@ def gesture_action():
 	count_stop_left = 0 
 	count_stop_right = 0 
 	count_stop = 0 
-	old_center_left = [0, 0] 
-	old_center_right = [0, 0] 
-	old_center = [0, 0] 
-	center_left = [0, 0] 
-	center_right = [0, 0] 
+	old_center_left = [0, 0]
+	old_center_right = [0, 0]
+	old_center = [0, 0]
+	center_left = [0, 0]
+	center_right = [0, 0]
 	center = [0, 0]
 	
 	cam = cv2.VideoCapture(1)
