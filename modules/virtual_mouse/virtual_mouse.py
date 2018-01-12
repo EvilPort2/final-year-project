@@ -9,6 +9,10 @@ def zooming(diff):
     gui.keyDown('ctrlleft')
     for i in range(abs(mod_diff)):
         gui.scroll(mod_diff/abs(mod_diff))
+        if mod_diff/abs(mod_diff) > 0:
+            gui.press('+')
+        else:
+            gui.press('-')
     gui.keyUp('ctrlleft')
 
 def top(collection, key, n):
@@ -44,7 +48,7 @@ def start_mouse():
     distance = old_distance = 0
     diff = 0
     c = 0
-    
+
     while True:
         _, img = cam.read()
 
@@ -129,7 +133,7 @@ def start_mouse():
 
             if not flag0:
                 if abs(center[0]-old_center[0]) > 5 or abs(center[1]-old_center[1]) > 5 or damping == 1.3:
-                    gui.moveTo(mposx+(center[0]-old_center[0])*sx, mposy + (center[1]-old_center[1])*sy)
+                    gui.moveTo(mposx+(center[0]-old_center[0])*sx, mposy + (center[1]-old_center[1])*sy, duration = 0.5, tween = gui.easeInOutQuad)
             else:
                 #gui.moveTo(mposx, mposy)
                 flag0 = False
@@ -216,7 +220,7 @@ def start_mouse():
                     flag3 = False
                     flag2 = False
                     flag1 = True
-                gui.moveTo(mposx+(center[0]-old_center[0])*sx, mposy + (center[1]-old_center[1])*sy)
+                gui.moveTo(mposx+(center[0]-old_center[0])*sx, mposy + (center[1]-old_center[1])*sy, duration = 0.5, tween = gui.easeInOutQuad)
             else:
                 # start the virtual keyboard
                 pass
