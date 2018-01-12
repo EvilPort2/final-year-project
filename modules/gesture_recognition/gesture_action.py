@@ -76,9 +76,16 @@ def gesture_action():
 	created_gesture_hand = []
 	created_gesture_hand_left = []
 	created_gesture_hand_right = []
-	count_stop_left, count_stop_right, count_stop = 0, 0, 0 
-	old_center_left, old_center_right, old_center, center_left, center_right, center = [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]
-
+	count_stop_left = 0 
+	count_stop_right = 0 
+	count_stop = 0 
+	old_center_left = [0, 0] 
+	old_center_right = [0, 0] 
+	old_center = [0, 0] 
+	center_left = [0, 0] 
+	center_right = [0, 0] 
+	center = [0, 0]
+	
 	cam = cv2.VideoCapture(1)
 	while True:
 		print(count_stop, count_stop_right, count_stop_left)
