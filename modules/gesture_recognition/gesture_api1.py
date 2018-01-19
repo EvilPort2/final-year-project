@@ -68,10 +68,18 @@ def lockscreen(cam):
 	cam = cv2.VideoCapture(1)
 	return cam
 
+def start_keyboard(cam):
+	from modules.virtual_keyboard.virtual_keyboard import start_keyboard
+	cam.release()
+	start_keyboard()
+	cam = cv2.VideoCapture(1)
+	return cam
+
 def task_manager(x = None):
 	gui.hotkey('ctrlleft', 'shiftleft', 'esc')
 
 GEST_START = ("N", "E", "S", "W")
+GEST_KEYBOARD = ("E", "S", "W", "N")
 GEST_CLOSE = ("SE", "N", "SW")
 GEST_COPY = ("W", "S", "E")
 GEST_PASTE = ("SE", "NE")
@@ -98,7 +106,8 @@ GEST_MINIMIZE: minimize,
 GEST_LOCK: lockscreen,
 GEST_TASK_MANAGER: task_manager,
 GEST_NEW_FILE: new_file,
-GEST_SELECT_ALL: select_all}
+GEST_SELECT_ALL: select_all,
+GEST_KEYBOARD: start_keyboard}
 
 
 GEST_SCREENSHOT = (("W", "S", "E"), ("E", "S", "W"))

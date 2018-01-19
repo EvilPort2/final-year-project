@@ -7,7 +7,6 @@ from collections import deque
 import datetime
 import pickle
 import os, thread
-import pyHook, pythoncom
 from .gesture_api1 import do_gesture_action
 
 def contour_area_sort(contours, area_threshold):
@@ -17,24 +16,27 @@ def contour_area_sort(contours, area_threshold):
 
 def determine_direction(diff):
 	diffx, diffy = diff[0], diff[1]
-	if abs(diffx) <=10 and abs(diffy) <= 10:
+	'''if abs(diffx) <=10 and abs(diffy) <= 10:
 		return "St"
-	elif diffx > 10 and abs(diffy) <= 10:
-		return "E"
-	elif diffx < -10 and abs(diffy) <= 10:
-		return "W"
-	elif abs(diffx) <= 10 and diffy < -10:
-		return "N"
-	elif abs(diffx) <= 10 and diffy > 10:
-		return "S"
-	elif diffx > 15 and diffy > 15:
-		return "SE"
-	elif diffx < -15 and diffy > 15:
-		return "SW"
-	elif diffx > 15 and diffy < -15:
-		return "NE"
-	elif diffx < -15 and diffy < -15:
-		return "NW"
+	el'''
+	direction = ""
+	if diffx > 20 and abs(diffy) <= 20:
+		direction = "E"
+	elif diffx < -20 and abs(diffy) <= 20:
+		direction = "W"
+	elif abs(diffx) <= 20 and diffy < -20:
+		direction = "N"
+	elif abs(diffx) <= 20 and diffy > 20:
+		direction = "S"
+	elif diffx > 25 and diffy > 25:
+		direction = "SE"
+	elif diffx < -25 and diffy > 25:
+		direction = "SW"
+	elif diffx > 25 and diffy < -25:
+		direction = "NE"
+	elif diffx < -25 and diffy < -25:
+		direction = "NW"
+	return direction
 
 def process_created_gesture(created_gesture):
 	"""
@@ -44,8 +46,8 @@ def process_created_gesture(created_gesture):
 	if created_gesture != []:
 		for i in range(created_gesture.count(None)):
 			created_gesture.remove(None)
-		for i in range(created_gesture.count('St')):
-			created_gesture.remove('St')
+		for i in range(created_gesture.count('')):
+			created_gesture.remove('')
 
 		if len(created_gesture) < 2:
 			return created_gesture
@@ -88,7 +90,6 @@ def gesture_action():
 	
 	cam = cv2.VideoCapture(1)
 	while True:
-		print(count_stop, count_stop_right, count_stop_left)
 		_, img = cam.read()
 
 		# Resize for faster processing. Flipping for better orientation
@@ -207,7 +208,9 @@ def gesture_action():
 				diff = np.array(center) - np.array(old_center)
 				c1 = 0
 
-			if determine_direction(diff) == 'St':
+			direction = determine_direction(diff)
+
+			if direction == 'St':
 				count_stop += 1
 			else:
 				count_stop = 0
@@ -215,7 +218,7 @@ def gesture_action():
 			if flags == [True, False, False]:
 				created_gesture_hand.append(None)
 			else:
-				created_gesture_hand.append(determine_direction(diff))
+				created_gesture_hand.append(direction)
 
 			for i in range(1, len(line_pts)):
 				if line_pts[i - 1] is None or line_pts[i] is None:

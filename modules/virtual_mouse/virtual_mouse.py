@@ -23,8 +23,6 @@ def top(collection, key, n):
     return returnable
 
 def start_mouse():
-    #kernelopen = np.ones((5, 5), np.uint8)
-    #kernelclose = np.ones((15, 15), np.uint8)
     with open("range.pickle", "rb") as f:
         t = pickle.load(f)
 
@@ -49,27 +47,15 @@ def start_mouse():
     diff = 0
     c = 0
 
+    right_click_frame_count = 0
+
     while True:
         _, img = cam.read()
-
-        #  Flipping for better orientation
         img = cv2.flip(img, 1)
-
-        # Convert to HSV for better color segmentation
         imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-
-        # Mask for blue color
         mask = cv2.inRange(imgHSV, lower, upper)
-        #mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernelopen)
-        #mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernelclose)
-        #cv2.imshow("mask", mask)
-
-        # Bluring to reduce noises
         blur = cv2.medianBlur(mask, 15)
         blur = cv2.GaussianBlur(blur , (5,5), 0)
-        #cv2.imshow("Blur", blur)
-
-        # Thresholding
         _,thresh = cv2.threshold(blur,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
         cv2.imshow("Thresh", thresh)
 
@@ -135,7 +121,6 @@ def start_mouse():
                 if abs(center[0]-old_center[0]) > 5 or abs(center[1]-old_center[1]) > 5 or damping == 1.3:
                     gui.moveTo(mposx+(center[0]-old_center[0])*sx, mposy + (center[1]-old_center[1])*sy, duration = 0.5, tween = gui.easeInOutQuad)
             else:
-                #gui.moveTo(mposx, mposy)
                 flag0 = False
 
         elif len(contours) >= 2:
@@ -164,12 +149,14 @@ def start_mouse():
                 error1 = error2 = error3 = error4 = error5 = error6 = 100
 
             if (error1 <= 50 and error6 < 20) or (error2 <= 50 and error5 < 20) or (error3 <= 50 and error4 < 20):
+                right_click_frame_count += 1
                 cv2.circle(img,(int(x), int(y)), int(radius), (0, 255, 0), 2)
-                if flag3 == True and radius > 20:
+                if flag3 == True and radius > 20 and right_click_frame_count == 10:
                     gui.rightClick()
                     flag3 = False
                     flag2 = True
                     flag1 = False
+                    right_click_frame_count = 0
  
             else:
                 rect1 = cv2.minAreaRect(c1)

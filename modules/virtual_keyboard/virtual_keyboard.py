@@ -115,9 +115,10 @@ def start_keyboard():
 	hsv_upper = np.array([t[3], t[4], t[5]])
 	row_keys_points = get_keys(width, height)
 	new_area, old_area = 0, 0
-	c, c2 = 0, 0									# c stores the number of iterations for calculating the difference b/w present area and previous area
-													# c2 stores the number of iterations for calculating the difference b/w present center and previous center
+	count_frame_area, count_frame_center = 0, 0		# count_frame_area stores the number of iterations for calculating the difference b/w present area and previous area
+													# count_frame_center stores the number of iterations for calculating the difference b/w present center and previous center
 	flag_keypress = False							# if a key is pressed then this flag is True
+	no_finger_count_frame = 0
 	while True:
 		img = cam.read()[1]
 		img = cv2.flip(img, 1)
@@ -129,12 +130,14 @@ def start_keyboard():
 		contours = cv2.findContours(thresh.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)[1]
 
 		if len(contours) >= 3:
+			no_finger_count_frame = 0
 			c1, c2, c3 = top(contours, cv2.contourArea, 3)
 			if cv2.contourArea(c1) > 350 and cv2.contourArea(c2) > 350 and cv2.contourArea(c3) > 350:
 				# start the virtual mouse
 				pass
 		
 		elif len(contours) >= 1:
+			no_finger_count_frame = 0
 			cnt = max(contours, key = cv2.contourArea)
 			
 			if cv2.contourArea(cnt) > 350:
@@ -149,24 +152,26 @@ def start_keyboard():
 				# calculation of difference of area and center
 				new_area = cv2.contourArea(cnt)
 				new_center = np.int0(center)
-				if c == 0:
+				
+				if count_frame_area == 0:
 					old_area = new_area
-				c += 1
+				count_frame_area += 1
 				diff_area = 0
-				if c > 3:								# after every 3rd iteration difference of area is calculated
+				if count_frame_area > 3:								# after every 3rd iteration difference of area is calculated
 					diff_area = new_area - old_area
-					c = 0
-				if c2 == 0:
+					count_frame_area = 0
+				if count_frame_center == 0:
 					old_center = new_center
-				c2 += 1
+				count_frame_center += 1
 				diff_center = np.array([0, 0])
-				if c2 > 5:								# after every 5th iteration difference of center is claculated
+				if count_frame_center > 5:								# after every 5th iteration difference of center is claculated
 					diff_center = new_center - old_center
-					c2 = 0
+					count_frame_center = 0
+
 				
 				# setting some thresholds
 				center_threshold = 10
-				area_threshold = 200
+				area_threshold = 150
 				if abs(diff_center[0]) < center_threshold or abs(diff_center[1]) < center_threshold:
 					print(diff_area)
 					if diff_area > area_threshold and flag_keypress == False:
@@ -176,13 +181,20 @@ def start_keyboard():
 						flag_keypress = False
 			else:
 				flag_keypress = False
-		else:
+		
+		elif len(contours) == 0:
 			flag_keypress = False
+
+			# if no finger is found for next 100 frames stop the keyboard 
+			if no_finger_count_frame != 150:
+				no_finger_count_frame += 1
+			else:
+				break
 
 		# displaying the keyboard
 		for key in row_keys_points:
-			cv2.putText(img, key[0], key[3], cv2.FONT_HERSHEY_DUPLEX, 1, (0, 255, 0))
-			cv2.rectangle(img, key[1], key[2], (0, 255, 0), thickness = 2)
+			cv2.putText(img, key[0], key[3], cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 255))
+			cv2.rectangle(img, key[1], key[2], (0, 0, 255), thickness = 2)
 
 		cv2.imshow("img", img)
 		
