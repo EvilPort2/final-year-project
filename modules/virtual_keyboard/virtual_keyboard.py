@@ -33,7 +33,10 @@ def get_keys(frame_width, frame_height):
 	keys = "1 2 3 4 5 6 7 8 9 0 <-"
 	keys = keys.split(" ")
 	for key in keys:
-		row_keys.append([key, (x1, y1), (x2, y2), (int((x2+x1)/2) - 5, int((y2+y1)/2) + 10)])
+		if key == "<-":
+			row_keys.append([key, (x1, y1), (x2, y2), (int((x2+x1)/2) - 25, int((y2+y1)/2) + 10)])
+		else:
+			row_keys.append([key, (x1, y1), (x2, y2), (int((x2+x1)/2) - 5, int((y2+y1)/2) + 10)])
 		x1 += key_width
 		x2 += key_width
 	x1, y1 = c1, c2					# copying back from c1, c2, c3 and c4
@@ -102,6 +105,9 @@ def do_keypress(img, center, row_keys_points):
 												(255, 0, 0))
 	return img
 
+def start_virtual_mouse():
+	from modules.virtual_mouse.virtual_mouse import start_mouse
+	start_mouse()
 
 def start_keyboard():
 	cam = cv2.VideoCapture(1)
@@ -119,6 +125,8 @@ def start_keyboard():
 													# count_frame_center stores the number of iterations for calculating the difference b/w present center and previous center
 	flag_keypress = False							# if a key is pressed then this flag is True
 	no_finger_count_frame = 0
+	flag_start_mouse = False
+
 	while True:
 		img = cam.read()[1]
 		img = cv2.flip(img, 1)
@@ -133,9 +141,11 @@ def start_keyboard():
 			no_finger_count_frame = 0
 			c1, c2, c3 = top(contours, cv2.contourArea, 3)
 			if cv2.contourArea(c1) > 350 and cv2.contourArea(c2) > 350 and cv2.contourArea(c3) > 350:
-				# start the virtual mouse
-				pass
-		
+				# start virtual mouse
+				flag_start_mouse = True
+				break
+				
+				
 		elif len(contours) >= 1:
 			no_finger_count_frame = 0
 			cnt = max(contours, key = cv2.contourArea)
@@ -196,7 +206,7 @@ def start_keyboard():
 			cv2.putText(img, key[0], key[3], cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 255))
 			cv2.rectangle(img, key[1], key[2], (0, 0, 255), thickness = 2)
 
-		cv2.imshow("img", img)
+		cv2.imshow("Virtual Keyboard", img)
 		
 		if cv2.waitKey(1) == ord('q'):
 			break
@@ -204,3 +214,5 @@ def start_keyboard():
 	cam.release()
 	cv2.destroyAllWindows()
 
+	if flag_start_mouse:
+		start_virtual_mouse()

@@ -44,8 +44,6 @@ def process_created_gesture(created_gesture):
 	occur consecutively.
 	"""
 	if created_gesture != []:
-		for i in range(created_gesture.count(None)):
-			created_gesture.remove(None)
 		for i in range(created_gesture.count('')):
 			created_gesture.remove('')
 
@@ -63,8 +61,8 @@ def gesture_action():
 	with open("range.pickle", "rb") as f:
 		t = pickle.load(f)
 	print(t)
-	yellow_lower = np.array([t[0], t[1], t[2]])						  # HSV yellow lower
-	yellow_upper = np.array([t[3], t[4], t[5]])					  # HSV yellow upper
+	hsv_lower = np.array([t[0], t[1], t[2]])						  # HSV hsv lower
+	hsv_upper = np.array([t[3], t[4], t[5]])					  # HSV hsv upper
 	screen_width, screen_height = gui.size()
 	#camx, camy = 480, 360
 
@@ -91,24 +89,13 @@ def gesture_action():
 	cam = cv2.VideoCapture(1)
 	while True:
 		_, img = cam.read()
-
-		# Resize for faster processing. Flipping for better orientation
 		img = cv2.flip(img, 1)
-		#img = cv2.resize(img, (camx, camy))
-
-		# Convert to HSV for better color segmentation
 		imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-
-		# Mask for yellow color
-		mask = cv2.inRange(imgHSV, yellow_lower, yellow_upper)
-
-		# Bluring to reduce noises
+		mask = cv2.inRange(imgHSV, hsv_lower, hsv_upper)
 		blur = cv2.medianBlur(mask, 15)
 		blur = cv2.GaussianBlur(blur , (5,5), 0)
-
-		# Thresholding
 		thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)[1]
-		cv2.imshow("Thresh Yellow", thresh)
+		cv2.imshow("Thresh", thresh)
 
 		cnts = cv2.findContours(thresh.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)[1]
 		cnts = contour_area_sort(cnts, 350)
@@ -155,18 +142,21 @@ def gesture_action():
 				diff_right = np.array(center_right) - np.array(old_center_right)
 				c2 = 0
 
-			if determine_direction(diff_left) == 'St':
+			left_hand_direction = determine_direction(diff_left)
+			right_hand_direction = determine_direction(diff_right)
+
+			if left_hand_direction == '':
 				count_stop_left += 1
 			else:
 				count_stop_left = 0
 
-			if determine_direction(diff_right) == 'St':
+			if right_hand_direction == '':
 				count_stop_right += 1
 			else:
 				count_stop_right = 0
 
-			created_gesture_hand_left.append(determine_direction(diff_left))
-			created_gesture_hand_right.append(determine_direction(diff_right))
+			created_gesture_hand_left.append(left_hand_direction)
+			created_gesture_hand_right.append(right_hand_direction)
 
 			for i in range(1, len(line_pts1)):
 				if line_pts1[i - 1] is None or line_pts1[i] is None:
@@ -210,14 +200,12 @@ def gesture_action():
 
 			direction = determine_direction(diff)
 
-			if direction == 'St':
+			if direction == '':
 				count_stop += 1
 			else:
 				count_stop = 0
 
-			if flags == [True, False, False]:
-				created_gesture_hand.append(None)
-			else:
+			if flags != [True, False, False]:
 				created_gesture_hand.append(direction)
 
 			for i in range(1, len(line_pts)):
@@ -263,7 +251,7 @@ def gesture_action():
 				created_gesture_hand.clear()
 				
 			flags = [True, False, False]
-		cv2.imshow("IMG", img)
+		cv2.imshow("Gesture Recognition", img)
 		if cv2.waitKey(1) == ord('q'):
 			break
 
