@@ -12,36 +12,43 @@ def createDataset():
     eyeCascade = cv2.CascadeClassifier(eyeCascadePath)
 
     while True:
+        user_id = (input("\nEnter the user id: "))
+        if user_id.strip() == '':
+            break
         try:
-            id = int(input("\nEnter the user id: "))
+            user_id = int(user_id)
             break
         except KeyboardInterrupt:
             print("Exiting...")
             exit(1)
         except:
             continue
+
     i = 0
     j = 100
 
     flag = 1  # if flag is 1 then id does not exist in database else id exists
     conn = sqlite3.connect("modules/face_lock_unlock/face_recognition/faceDetectDatabase.db")
-    try:
-        cmd = "SELECT * FROM People WHERE ID = " + str(id)
-        cursor = conn.execute(cmd)
-    except sqlite3.OperationalError:
-        cmd1 = "CREATE TABLE People (id varchar(3), name varchar(50), occupation varchar(100), gender varchar(10), lastPictureNumber varchar(10))"
-        conn.execute(cmd1)
-        cursor = conn.execute(cmd)
-    for row in cursor:
-        flag = 0
+    if user_id != "":
+        try:
+            cmd = "SELECT * FROM People WHERE ID = " + str(user_id)
+            cursor = conn.execute(cmd)
+        except sqlite3.OperationalError:
+            cmd1 = "CREATE TABLE People ( id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE, name varchar ( 50 ), occupation varchar ( 100 ), gender varchar ( 10 ), lastPictureNumber varchar ( 10 ) )"
+            conn.execute(cmd1)
+            cursor = conn.execute(cmd)
+        for row in cursor:
+            flag = 0
 
     # ID not in Database
     if flag == 1:
         name = input("Enter new name: ")
         occupation = input("Enter new occupation: ")
         gender = input("Enter new gender: ")
-        cmd = "INSERT INTO People VALUES(" + str(id) + ",\"" + str(name) + "\",\"" + str(occupation) + "\",\"" + str(
-            gender) + "\",100)"
+        if user_id != "":
+            cmd = "INSERT INTO People VALUES(" + str(user_id) + ",\"" + str(name) + "\",\"" + str(occupation) + "\",\"" + str(gender) + "\",100)"
+        else:
+            cmd = "INSERT INTO People (name, occupation, gender, lastPictureNumber) VALUES(\"" + str(name) + "\",\"" + str(occupation) + "\",\"" + str(gender) + "\",100)"
         conn.execute(cmd)
         conn.commit()
         conn.close()
@@ -60,24 +67,24 @@ def createDataset():
                 break
 
         if choice == 1:
-            cmd = "DELETE FROM People WHERE ID=" + str(id)
+            cmd = "DELETE FROM People WHERE ID=" + str(user_id)
             conn.execute(cmd)
             conn.commit()
-            name = str(input("Enter new name: "))
-            occupation = str(input("Enter new occupation: "))
-            gender = str(input("Enter new gender: "))
-            for f in glob.glob("modules/face_lock_unlock/face_recognition/dataset/user." + str(id) + "*.jpg"):
+            name = input("Enter new name: ")
+            occupation = input("Enter new occupation: ")
+            gender = input("Enter new gender: ")
+            for f in glob.glob("modules/face_lock_unlock/face_recognition/dataset/user." + str(user_id) + "*.jpg"):
                 os.remove(f)
-            cmd = "INSERT INTO People VALUES(" + str(id) + ",\"" + name + "\",\"" + occupation + "\",\"" + gender + "\",\"" + str(j)+ "\")"
+            cmd = "INSERT INTO People VALUES(" + str(user_id) + ",\"" + name + "\",\"" + occupation + "\",\"" + gender + "\",\"" + str(j)+ "\")"
             conn.execute(cmd)
             conn.commit()
             conn.close()
 
         else:
-            profile = getProfileDataById(id)
+            profile = getProfileDataById(user_id)
             i = int(profile[4])
             j = i + 100
-            cmd = "UPDATE People SET lastPictureNumber="+str(j)+" WHERE ID="+str(id)
+            cmd = "UPDATE People SET lastPictureNumber="+str(j)+" WHERE ID="+str(user_id)
             conn.execute(cmd)
             conn.commit()
             conn.close()
@@ -92,7 +99,7 @@ def createDataset():
             face = gray[y:y+h, x:x+w]
             eyes = eyeCascade.detectMultiScale(face, 1.1, 5, flags = cv2.CASCADE_SCALE_IMAGE)
             if len(eyes) == 2:
-                cv2.imwrite("modules/face_lock_unlock/face_recognition/dataset/user." + str(id) + "." + str(i) + ".jpg", gray[y:y + h, x:x + w])
+                cv2.imwrite("modules/face_lock_unlock/face_recognition/dataset/user." + str(user_id) + "." + str(i) + ".jpg", gray[y:y + h, x:x + w])
                 cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
                 i = i + 1
             cv2.waitKey(1)
