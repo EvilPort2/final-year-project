@@ -12,6 +12,10 @@ def top(collection, key, n):
         returnable.append(collection[i])
     return returnable
 
+def start_virtual_keyboard():
+	from modules.virtual_keyboard import start_keyboard
+	start_keyboard()
+
 def start_mouse():
     with open("range.pickle", "rb") as f:
         t = pickle.load(f)
@@ -27,6 +31,7 @@ def start_mouse():
     area1 = area2 = 0
     damping = 0.5
     sx, sy = (screen_width/frame_width)/damping, (screen_height/frame_height)/damping
+    flag_start_keyboard = False
 
     is_mouse_down = False
 
@@ -49,6 +54,8 @@ def start_mouse():
 
         #print(flags)
         if len(contours) >= 2:
+        	finger_frame_count[1] = 0
+        	finger_frame_count[0] = 0
             old_center[0] = center[0]
             if is_mouse_down:
                 thread.start_new_thread(gui.mouseUp, ())
@@ -96,6 +103,8 @@ def start_mouse():
             flags = [False, False, True]      
 
         elif len(contours) >= 1:
+        	finger_frame_count[2] = 0
+        	finger_frame_count[0] = 0
             old_center[1] = center[1]
             c1 = max(contours, key = cv2.contourArea)
             rect1 = cv2.minAreaRect(c1)
@@ -120,11 +129,19 @@ def start_mouse():
                 flags = [False, True, False]
             else:
                 flags = [True, False, False]
+                flag_start_keyboard = True
+                break
 
         else:
+        	finger_frame_count[2] = 0
+        	finger_frame_count[1] = 0
+        	finger_frame_count[0] += 1
             if is_mouse_down:
                 thread.start_new_thread(gui.mouseUp, ())
                 is_mouse_down = False
+            if finger_frame_count[0] > 100:
+            	flag_start_gesture = True
+            	break
             flags = [True, False, False]
 
         cv2.imshow("Virtual Mouse", img)
@@ -134,4 +151,8 @@ def start_mouse():
     cam.release()
     cv2.destroyAllWindows()
     gui.mouseUp()
+
+    if flag_start_keyboard:
+    	start_virtual_keyboard()
+
          

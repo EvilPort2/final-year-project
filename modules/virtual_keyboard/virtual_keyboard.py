@@ -137,10 +137,10 @@ def start_keyboard():
 		thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)[1]
 		contours = cv2.findContours(thresh.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)[1]
 
-		if len(contours) >= 3:
+		if len(contours) >= 2:
 			no_finger_count_frame = 0
-			c1, c2, c3 = top(contours, cv2.contourArea, 3)
-			if cv2.contourArea(c1) > 350 and cv2.contourArea(c2) > 350 and cv2.contourArea(c3) > 350:
+			c1, c2 = top(contours, cv2.contourArea, 2)
+			if cv2.contourArea(c1) > 350 and cv2.contourArea(c2) > 350:
 				# start virtual mouse
 				flag_start_mouse = True
 				break
@@ -196,7 +196,7 @@ def start_keyboard():
 			flag_keypress = False
 
 			# if no finger is found for next 100 frames stop the keyboard 
-			if no_finger_count_frame != 150:
+			if no_finger_count_frame != 100:
 				no_finger_count_frame += 1
 			else:
 				break

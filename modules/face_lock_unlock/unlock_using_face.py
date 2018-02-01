@@ -18,6 +18,7 @@ class DisplayFaceRecognizer(Thread):
         self.start()
         
     def run(self):
+        unlockFaceId = []
         if not os.path.exists("modules/face_lock_unlock/face_recognition/faceDetectDatabase.db"):
             print("Database does not exist. Create a database first from Settings>>Train the face recognizer")
             with open("match_face_result", "w") as f:
@@ -26,7 +27,7 @@ class DisplayFaceRecognizer(Thread):
 
         conn = sqlite3.connect("modules/face_lock_unlock/face_recognition/faceDetectDatabase.db")
         try:
-            cmd = "SELECT MIN(id) FROM People"
+            cmd = "SELECT id FROM People WHERE is_password=1"
             cursor = conn.execute(cmd)
         except sqlite3.OperationalError:
             print("Table does not exist. Create a table first from Settings>>Train the face recognizer")
@@ -34,7 +35,7 @@ class DisplayFaceRecognizer(Thread):
                 f.write("True")
             return
         for row in cursor:
-            unlockFaceId = row[0]
+            unlockFaceId.append(int(row[0]))
         self.is_matched = match_face(unlockFaceId)
 
 class DisplayLockscreenText(Thread):

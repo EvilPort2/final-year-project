@@ -27,10 +27,10 @@ def match_face(unlockFaceId):
 			eyes = eyeCascade.detectMultiScale(face, 1.1, 5, flags = cv2.CASCADE_SCALE_IMAGE)
 			if len(eyes) == 2:
 				faceId, confidence = recog.predict(face)
-				if confidence < 60:
+				if confidence < 50:
 					profile = getProfileDataById(str(faceId))
 					name = profile[1]
-					if unlockFaceId == faceId:
+					if faceId in unlockFaceId:
 						matchFrameCount += 0.5
 					else:
 						matchFrameCount = 0

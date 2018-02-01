@@ -3,6 +3,7 @@ import sys
 from modules.gesture_recognition.gesture_action import gesture_action 
 from modules.color_picker.color_picker import color_picker
 from modules.face_lock_unlock.face_recognition.faceRecognizeMain import face_recognition_main
+from modules.init import create_folders
 
 def clear_screen():
 	os.system("cls")
@@ -40,9 +41,8 @@ def show_settings():
 			return
 
 
-
-
 def main():
+	create_folders()
 	while True:
 		clear_screen()
 		print("\t\t\tMAIN MENU")

@@ -34,10 +34,10 @@ def createDataset():
             cmd = "SELECT * FROM People WHERE ID = " + str(user_id)
             cursor = conn.execute(cmd)
         except sqlite3.OperationalError:
-            cmd1 = "CREATE TABLE People ( id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE, name varchar ( 50 ), occupation varchar ( 100 ), gender varchar ( 10 ), lastPictureNumber varchar ( 10 ) )"
+            cmd1 = "CREATE TABLE People ( id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE, name varchar ( 50 ), occupation varchar ( 100 ), gender varchar ( 10 ), lastPictureNumber varchar ( 10 ), is_password INTEGER DEFAULT 0 )"
             conn.execute(cmd1)
             cursor = conn.execute(cmd)
-        for row in cursor:
+        if len(cursor) != 0:
             flag = 0
 
     # ID not in Database
@@ -45,10 +45,14 @@ def createDataset():
         name = input("Enter new name: ")
         occupation = input("Enter new occupation: ")
         gender = input("Enter new gender: ")
+        while True:
+            is_password = input("Set this face as password (0 for no and 1 for yes): ")
+            if is_password != "0" or is_password != "1":
+                continue
         if user_id != "":
-            cmd = "INSERT INTO People VALUES(" + str(user_id) + ",\"" + str(name) + "\",\"" + str(occupation) + "\",\"" + str(gender) + "\",100)"
+            cmd = "INSERT INTO People VALUES(" + str(user_id) + ",\"" + str(name) + "\",\"" + str(occupation) + "\",\"" + str(gender) + "\",100, "+is_password+" )"
         else:
-            cmd = "INSERT INTO People (name, occupation, gender, lastPictureNumber) VALUES(\"" + str(name) + "\",\"" + str(occupation) + "\",\"" + str(gender) + "\",100)"
+            cmd = "INSERT INTO People (name, occupation, gender, lastPictureNumber, is_password) VALUES(\"" + str(name) + "\",\"" + str(occupation) + "\",\"" + str(gender) + "\",100, "+is_password+" )"
         conn.execute(cmd)
         conn.commit()
         conn.close()
@@ -73,9 +77,13 @@ def createDataset():
             name = input("Enter new name: ")
             occupation = input("Enter new occupation: ")
             gender = input("Enter new gender: ")
+            while True:
+            is_password = input("Set this face as password (0 for no and 1 for yes): ")
+            if is_password != "0" or is_password != "1":
+                continue
             for f in glob.glob("modules/face_lock_unlock/face_recognition/dataset/user." + str(user_id) + "*.jpg"):
                 os.remove(f)
-            cmd = "INSERT INTO People VALUES(" + str(user_id) + ",\"" + name + "\",\"" + occupation + "\",\"" + gender + "\",\"" + str(j)+ "\")"
+            cmd = "INSERT INTO People VALUES(" + str(user_id) + ",\"" + name + "\",\"" + occupation + "\",\"" + gender + "\",\"" + str(j)+ "\", "+ is_password + ")"
             conn.execute(cmd)
             conn.commit()
             conn.close()
@@ -95,6 +103,8 @@ def createDataset():
         img = cv2.flip(img, 1)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         faces = faceCascade.detectMultiScale(gray, 1.1, 5, flags = cv2.CASCADE_SCALE_IMAGE)
+        if len(faces) != 1:
+            continue
         for (x, y, w, h) in faces:
             face = gray[y:y+h, x:x+w]
             eyes = eyeCascade.detectMultiScale(face, 1.1, 5, flags = cv2.CASCADE_SCALE_IMAGE)
