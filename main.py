@@ -42,8 +42,6 @@ def show_settings():
 
 
 def main():
-	create_folders()
-	create_databases()
 	while True:
 		clear_screen()
 		print("\t\t\tMAIN MENU")
@@ -76,4 +74,6 @@ def main():
 
 
 
+create_folders()
+create_databases()
 main()
