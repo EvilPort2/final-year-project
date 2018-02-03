@@ -54,7 +54,6 @@ def start_mouse():
 
         #print(flags)
         if len(contours) >= 2:
-        	finger_frame_count[1] = 0
         	finger_frame_count[0] = 0
             old_center[0] = center[0]
             if is_mouse_down:

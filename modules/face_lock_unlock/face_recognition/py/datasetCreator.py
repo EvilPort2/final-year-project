@@ -30,15 +30,11 @@ def createDataset():
     flag = 1  # if flag is 1 then id does not exist in database else id exists
     conn = sqlite3.connect("modules/face_lock_unlock/face_recognition/faceDetectDatabase.db")
     if user_id != "":
-        try:
-            cmd = "SELECT * FROM People WHERE ID = " + str(user_id)
-            cursor = conn.execute(cmd)
-        except sqlite3.OperationalError:
-            cmd1 = "CREATE TABLE People ( id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE, name varchar ( 50 ), occupation varchar ( 100 ), gender varchar ( 10 ), lastPictureNumber varchar ( 10 ), is_password INTEGER DEFAULT 0 )"
-            conn.execute(cmd1)
-            cursor = conn.execute(cmd)
-        if len(cursor) != 0:
+        cmd = "SELECT * FROM People WHERE ID = " + str(user_id)
+        cursor = conn.execute(cmd) 
+        for row in cursor:
             flag = 0
+            break
 
     # ID not in Database
     if flag == 1:
@@ -47,14 +43,19 @@ def createDataset():
         gender = input("Enter new gender: ")
         while True:
             is_password = input("Set this face as password (0 for no and 1 for yes): ")
-            if is_password != "0" or is_password != "1":
-                continue
+            if is_password == "0" or is_password == "1":
+                break
         if user_id != "":
             cmd = "INSERT INTO People VALUES(" + str(user_id) + ",\"" + str(name) + "\",\"" + str(occupation) + "\",\"" + str(gender) + "\",100, "+is_password+" )"
         else:
             cmd = "INSERT INTO People (name, occupation, gender, lastPictureNumber, is_password) VALUES(\"" + str(name) + "\",\"" + str(occupation) + "\",\"" + str(gender) + "\",100, "+is_password+" )"
         conn.execute(cmd)
         conn.commit()
+        cmd = "SELECT MAX(id) from People"
+        cursor = conn.execute(cmd)
+        for row in cursor:
+            user_id = str(row[0])
+            break
         conn.close()
 
     # ID is in database
@@ -78,9 +79,9 @@ def createDataset():
             occupation = input("Enter new occupation: ")
             gender = input("Enter new gender: ")
             while True:
-            is_password = input("Set this face as password (0 for no and 1 for yes): ")
-            if is_password != "0" or is_password != "1":
-                continue
+                is_password = input("Set this face as password (0 for no and 1 for yes): ")
+                if is_password != "0" or is_password != "1":
+                    continue
             for f in glob.glob("modules/face_lock_unlock/face_recognition/dataset/user." + str(user_id) + "*.jpg"):
                 os.remove(f)
             cmd = "INSERT INTO People VALUES(" + str(user_id) + ",\"" + name + "\",\"" + occupation + "\",\"" + gender + "\",\"" + str(j)+ "\", "+ is_password + ")"
@@ -98,21 +99,19 @@ def createDataset():
             conn.close()
 
     cam = cv2.VideoCapture(1)
-    while cam.isOpened():
+    while True:
         ret, img = cam.read() 
         img = cv2.flip(img, 1)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         faces = faceCascade.detectMultiScale(gray, 1.1, 5, flags = cv2.CASCADE_SCALE_IMAGE)
-        if len(faces) != 1:
-            continue
-        for (x, y, w, h) in faces:
-            face = gray[y:y+h, x:x+w]
-            eyes = eyeCascade.detectMultiScale(face, 1.1, 5, flags = cv2.CASCADE_SCALE_IMAGE)
-            if len(eyes) == 2:
-                cv2.imwrite("modules/face_lock_unlock/face_recognition/dataset/user." + str(user_id) + "." + str(i) + ".jpg", gray[y:y + h, x:x + w])
-                cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
-                i = i + 1
-            cv2.waitKey(1)
+        if len(faces) == 1:
+            for (x, y, w, h) in faces:
+                face = gray[y:y+h, x:x+w]
+                eyes = eyeCascade.detectMultiScale(face, 1.1, 5, flags = cv2.CASCADE_SCALE_IMAGE)
+                if len(eyes) == 2:
+                    cv2.imwrite("modules/face_lock_unlock/face_recognition/dataset/user." + str(user_id) + "." + str(i) + ".jpg", face)
+                    cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
+                    i = i + 1
         cv2.imshow("Webcam Face Detection", img)
         cv2.waitKey(1)
         if i > j:
