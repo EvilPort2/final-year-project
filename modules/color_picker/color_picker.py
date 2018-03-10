@@ -5,6 +5,8 @@ from .check_range import check_range
 
 def color_picker():
 	cam = cv2.VideoCapture(1)
+	if cam.read()[0]==False:
+		cam=cv2.VideoCapture(0)
 	width = cam.get(cv2.CAP_PROP_FRAME_WIDTH)	
 	height = cam.get(cv2.CAP_PROP_FRAME_HEIGHT)
 	center = (int(width/2), int(height/2))
@@ -55,10 +57,11 @@ def color_picker():
 			countTotalFrames = 0
 			flagDotDisplayed = True
 
-		if cv2.waitKey(1) == ord('q'):
+		keypress = cv2.waitKey(1)
+		if keypress == ord('q'):
 			break
 
-		if cv2.waitKey(1) == ord('c') or flagCapturingColor == True:
+		if keypress == ord('c') or flagCapturingColor == True:
 			print(countColorPickerFrames)
 			if countColorPickerFrames >= 50:
 				HSVColor.append((colorHSV1 + colorHSV2 + colorHSV3 + colorHSV4 + colorHSV5 + colorHSV6 + colorHSV7 + colorHSV8 + colorHSV9) / 9 )

@@ -6,7 +6,7 @@ from imutils import contours
 from collections import deque
 import datetime
 import pickle
-import os, thread
+import os
 from .gesture_api1 import do_gesture_action
 
 def contour_area_sort(contours, area_threshold):
@@ -16,10 +16,10 @@ def contour_area_sort(contours, area_threshold):
 
 def determine_direction(diff):
 	diffx, diffy = diff[0], diff[1]
-	'''if abs(diffx) <=10 and abs(diffy) <= 10:
-		return "St"
-	el'''
+
 	direction = ""
+	if abs(diffx) <=10 and abs(diffy) <= 10:
+		direction = ""
 	if diffx > 20 and abs(diffy) <= 20:
 		direction = "E"
 	elif diffx < -20 and abs(diffy) <= 20:
@@ -87,6 +87,8 @@ def gesture_action():
 	center = [0, 0]
 	
 	cam = cv2.VideoCapture(1)
+	if cam.read()[0]==False:
+		cam=cv2.VideoCapture(0)
 	while True:
 		_, img = cam.read()
 		img = cv2.flip(img, 1)
@@ -100,8 +102,9 @@ def gesture_action():
 		cnts = cv2.findContours(thresh.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)[1]
 		cnts = contour_area_sort(cnts, 350)
 
+		print(count_stop_left, count_stop_right, count_stop)
 		# 2 hand gesture
-		if len(cnts) == 2 and count_stop_left <= 20 and count_stop_right <= 20:
+		if len(cnts) == 2:
 			if flags == [True, False, False]:
 				flags = [False, False, True]
 				continue
@@ -171,7 +174,7 @@ def gesture_action():
 			flags = [False, False, True]
 
 		# 1 hand gestures
-		elif len(cnts) == 1 and count_stop <= 20:
+		elif len(cnts) == 1:
 			if flags == [True, False, False]:
 				flags = [False, True, False]
 				continue
@@ -217,7 +220,7 @@ def gesture_action():
 
 
 		#completion of a gesture
-		elif len(cnts) == 0 or (count_stop_right > 20 and count_stop_left > 20) or (count_stop > 20):
+		if len(cnts) == 0 or (count_stop_right > 20 and count_stop_left > 20) or (count_stop > 20):
 			line_pts = deque(maxlen = buff)
 			line_pts1 = deque(maxlen = buff)
 			line_pts2 = deque(maxlen = buff)

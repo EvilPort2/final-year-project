@@ -19,15 +19,33 @@ class TakePhoto(Thread):
 		ts = time.time()
 		st = datetime.datetime.fromtimestamp(ts).strftime('%Y_%m_%d %H_%M_%S')
 		cv2.imwrite("photos/"+st + ".png", img1)
-		
 
-def screenshot(x):
+		
+def take_photo(cam):
+	cam.release()
+	cam = cv2.VideoCapture(1)
+	if cam.read()[0]==False:
+		cam=cv2.VideoCapture(0)
+	count_frames = 0
+	while count_frames != 50:
+		img = cam.read()[1]
+		img = cv2.flip(img, 1)
+		count_frames += 1
+		cv2.waitKey(1)
+		cv2.imshow("Taking a photo", img)
 	ts = time.time()
 	st = datetime.datetime.fromtimestamp(ts).strftime('%Y_%m_%d %H_%M_%S')
-	gui.screenshot("screenshot/" + st + ".png")
+	cv2.imwrite("photos/"+st + ".png", img)
+	cv2.destroyAllWindows()
+	return cam
+
+def screenshot(x = None):
+	ts = time.time()
+	st = datetime.datetime.fromtimestamp(ts).strftime('%Y_%m_%d %H_%M_%S')
+	gui.screenshot("screenshots/" + st + ".png")
 
 def text_editor(x = None):
-	thread.start_new_thread(os.system, ("notepad", ))
+	Thread(target=os.system, args=("notepad", )).atart()
 
 def start_menu(x = None):
 	gui.press('winleft')
@@ -66,6 +84,8 @@ def lockscreen(cam):
 	cam.release()
 	os.system("python modules/face_lock_unlock/unlock_using_face.py")
 	cam = cv2.VideoCapture(1)
+	if cam.read()[0]==False:
+		cam=cv2.VideoCapture(0)
 	return cam
 
 def start_keyboard(cam):
@@ -73,6 +93,8 @@ def start_keyboard(cam):
 	cam.release()
 	start_keyboard()
 	cam = cv2.VideoCapture(1)
+	if cam.read()[0]==False:
+		cam=cv2.VideoCapture(0)
 	return cam
 
 def task_manager(x = None):
@@ -116,7 +138,7 @@ GEST_TEXT_EDITOR = (("N", "E", "S", "W"), ("S",))
 
 GESTURES_TWO_HAND = \
 {GEST_SCREENSHOT: screenshot,
-GEST_CAMERA: TakePhoto,
+GEST_CAMERA: take_photo,
 GEST_TEXT_EDITOR: text_editor}
 
 def do_gesture_action(cam, gesture1, gesture2 = None):

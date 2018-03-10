@@ -9,6 +9,8 @@ def match_face(unlockFaceId):
 	eyeCascade = cv2.CascadeClassifier(eyeCascadePath)
 
 	cam = cv2.VideoCapture(1)
+	if cam.read()[0]==False:
+		cam=cv2.VideoCapture(0)
 	recog = cv2.face.LBPHFaceRecognizer_create()
 	recog.read('modules/face_lock_unlock/face_recognition/recognized/training.yml')
 

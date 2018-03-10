@@ -99,6 +99,9 @@ def createDataset():
             conn.close()
 
     cam = cv2.VideoCapture(1)
+    if cam.read()[0]==False:
+        cam=cv2.VideoCapture(0)
+        
     while True:
         ret, img = cam.read() 
         img = cv2.flip(img, 1)

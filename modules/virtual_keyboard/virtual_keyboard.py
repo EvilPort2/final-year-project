@@ -111,6 +111,8 @@ def start_virtual_mouse():
 
 def start_keyboard():
 	cam = cv2.VideoCapture(1)
+	if cam.read()[0]==False:
+		cam=cv2.VideoCapture(0)
 	width = 640	# width of video captured by the webcam
 	height = 480	# height of the video captured by the webcam
 	cam.set(cv2.CAP_PROP_FRAME_WIDTH, width)
@@ -125,6 +127,7 @@ def start_keyboard():
 													# count_frame_center stores the number of iterations for calculating the difference b/w present center and previous center
 	flag_keypress = False							# if a key is pressed then this flag is True
 	no_finger_count_frame = 0
+	two_finger_frame_count = 0
 	flag_start_mouse = False
 
 	while True:
@@ -137,10 +140,12 @@ def start_keyboard():
 		thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)[1]
 		contours = cv2.findContours(thresh.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)[1]
 
+		print(two_finger_frame_count)
 		if len(contours) >= 2:
 			no_finger_count_frame = 0
 			c1, c2 = top(contours, cv2.contourArea, 2)
-			if cv2.contourArea(c1) > 350 and cv2.contourArea(c2) > 350:
+			two_finger_frame_count += 1
+			if cv2.contourArea(c1) > 350 and cv2.contourArea(c2) > 350 and two_finger_frame_count > 100:
 				# start virtual mouse
 				flag_start_mouse = True
 				break

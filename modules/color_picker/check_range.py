@@ -10,6 +10,8 @@ def check_range():
 	lower = np.array([t[0], t[1], t[2]])                       # HSV green lower
 	upper = np.array([t[3], t[4], t[5]])                    # HSV green upper
 	cam = cv2.VideoCapture(1)
+	if cam.read()[0]==False:
+		cam=cv2.VideoCapture(0)
 	while True:
 		img = cam.read()[1]
 		img = cv2.flip(img, 1)
